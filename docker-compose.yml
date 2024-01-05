@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  apache:
+    image: httpd:2.4
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      #- ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf #/etc/apache2/sites-enabled/httpd.conf #/usr/local/apache2/conf/httpd.conf
+      - ./apache/ssl/server.crt:/usr/local/apache2/conf/ssl/server.crt
+      - ./apache/ssl/server.key:/usr/local/apache2/conf/ssl/server.key
+    depends_on:
+      - node
+    command: ["httpd", "-D", "FOREGROUND"] 
+    environment:
+      - APACHE_MPM_EVENT_ENABLE=yes
+
+  node:
+    #image: node:14
+    build: .
+    working_dir: /usr/src/app
+    volumes:
+      - ./node/app:/usr/src/app
+    command: npm start
